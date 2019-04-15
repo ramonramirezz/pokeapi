@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Gotta catch 'em all</title>
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+</head>
+<header>
+
+    <div>
+        <img src="img/pokeball.png">
+    </div>
+
+
+    <body>
+
+
+        <script src="./utils.js"></script>
+
+        <div>
+
+            <fieldset>
+                <legend>Información Pokemon</legend>
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" placeholder="Nombre del pokemon" required>
+
+                <label for="numero">Numero del pokedex: </label>
+                <input type="text" id="numero" placeholder="Numero pokedex" required>
+
+                <label for="tipo ">Tipo primario:</label>
+                <input type="text" id="tipo" placeholder="tipo del pokemon" required>
+
+                <label for="habilidad">Habilidad: </label>
+                <input type="text" id="habilidad" placeholder="habildiad principal" required></textarea>
+
+            </fieldset>
+            <input id="enviar" value="Enviar" class="boton boton-amarillo" onclick="enviar()">
+            <input id="cargar" value="Cargar" class="boton boton-verde" onclick="getPokemon()">
+
+        </div>
+
+
+
+        <div>
+            <table id="tabla">
+                <thead>
+                    <tr>
+                        <th>Numero</th>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Habilidad</th>
+                        <th>Editar</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+
+
+            </table>
+        </div>
+
+        <script>
+            (
+                () => {
+                    document.getElementById("eliminar").addEventListener("click", () => {
+                        alert();
+                    })
+                }
+            )();
+
+            const enviar = () => {
+                let pokemon = {
+                    name: document.getElementById("nombre").value,
+                    number: document.getElementById("numero").value,
+                    type: document.getElementById("tipo").value,
+                    ability: document.getElementById("habilidad").value
+                }
+                console.log(pokemon)
+                create(pokemon);
+
+            }
+        </script>
+
+        <script>
+            let pokedex = [];
+            const getPokemon = () => {
+                fetch('http://localhost:3000/api/pokeapi/pokemon', {
+                        method: 'get',
+                        headers: {
+                            'Content-Type': ' application/json'
+                        }
+
+                    })
+                    .then(res => res.json())
+                    .then(response => {
+                        let tabla = document.getElementById("tabla");
+                        for (let i = tabla.rows.length - 1; i > 0; i--) {
+                            tabla.deleteRow(i);
+
+                        }
+
+                        return response;
+
+                    })
+                    .then(response => {
+                        pokedex = response.data;
+
+                        let tabla = document.getElementById("tabla").getElementsByTagName("tbody")[0];
+                        pokedex.forEach((pokemon, index) => {
+
+                            let row = tabla.insertRow(tabla.rows.length);
+
+                            let btnEditar = document.createElement('input');
+                            btnEditar.id = "editar"
+                            btnEditar.type = "button";
+                            btnEditar.className = "btn";
+                            btnEditar.value = "editar";
+                            /* btnEditar.onclick = "editar()" */
+
+                            let btnEliminar = document.createElement('input');
+                            btnEliminar.id = "eliminar"
+                            btnEliminar.type = "button";
+                            btnEliminar.className = "btn";
+                            btnEliminar.value = "eliminar";
+                            btnEliminar.onclick = eliminar(pokemon._id);
+
+                            let cell1 = row.insertCell(0).appendChild(document.createTextNode(pokemon.number));
+                            let cell2 = row.insertCell(1).appendChild(document.createTextNode(pokemon.name));
+                            let cell3 = row.insertCell(2).appendChild(document.createTextNode(pokemon.type));
+                            let cell4 = row.insertCell(3).appendChild(document.createTextNode(pokemon.ability));
+                            let cell5 = row.insertCell(4).appendChild(btnEditar);
+                            let cell6 = row.insertCell(5).appendChild(btnEliminar);
+
+                        });
+
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+
+            }
+
+            const create = (pokemon) => {
+                fetch('http://localhost:3000/api/pokeapi/pokemon', {
+                        method: 'post',
+                        headers: {
+                            'Content-Type': ' application/json'
+                        },
+                        body: JSON.stringify(pokemon)
+                    })
+                    .then(res => res.json())
+                    .then(response => {
+                        let tabla = document.getElementById("tabla").getElementsByTagName("tbody")[0];
+                        let row = tabla.insertRow(tabla.rows.length);
+                        let cell1 = row.insertCell(0).appendChild(document.createTextNode(pokemon.number));
+                        let cell2 = row.insertCell(1).appendChild(document.createTextNode(pokemon.name));
+                        let cell3 = row.insertCell(2).appendChild(document.createTextNode(pokemon.type));
+                        let cell4 = row.insertCell(3).appendChild(document.createTextNode(pokemon.ability));
+
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+            }
+
+            const eliminar = (id) => {
+                fetch('http://localhost:3000/api/pokeapi/pokemon/' + id, {
+                        method: 'delete',
+                        headers: {
+                            'Content-Type': ' application/json'
+                        },
+
+                    })
+                    .then(res => res.json)
+                    .then(response => {
+                        console.log(response);
+
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+            }
+        </script>
+
+
+    </body>
+
+
+
+</html>
