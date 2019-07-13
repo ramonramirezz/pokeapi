@@ -1,20 +1,24 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 let mongoose = require('mongoose');
 
-var pokemon = require('./routes/pokemon');
+const pokemon = require('./routes/pokemon');
+const actor = require('./routes/actor');
 
-var app = express();
+
+
+const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser())
 
-mongoose.connect('mongodb://localhost/poke');
-var db = mongoose.connection;
+mongoose.connect('mongodb://localhost/poke', { useNewUrlParser: true });
+const db = mongoose.connection;
 
 app.use('/api/pokeapi', pokemon);
+app.use('/api/actorapi', actor);
 
 module.exports = app;
